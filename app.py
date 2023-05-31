@@ -3,13 +3,31 @@ from flask import Flask, render_template
 
 #convertir le fichier md en fichier html
 
-with open("mon_fichier.md", "r") as fichier_md:
-    contenu_md = fichier_md.read()
+def generation_html(nom_du_fichier):
 
-contenu_html = markdown.markdown(contenu_md)
+    print("Génération de la page Html ...")
 
-with open("index.html", "w") as fichier_html:
-    fichier_html.write(contenu_html)
+    try :
+        fichier = "Md/"+nom_du_fichier
+    except :
+        print("Le fichier n existe pas . Recommencer")
+
+
+    with open(fichier, "r") as fichier_md:
+        contenu_md = fichier_md.read()
+
+    contenu_html = markdown.markdown(contenu_md)
+
+    with open("Output/index.html", "w") as fichier_html:
+        fichier_html.write(contenu_html)
+
+    print("Génération terminée !")
+
+
+nom_fichier = "mon_fichier"+".md"
+chemin = "Md/"+nom_fichier
+
+generation_html(nom_fichier)
 
 #création du serveur local pour affichage du fichier html généré avec css et template
 
@@ -21,8 +39,8 @@ app.static_folder = 'static'
 @app.route('/')
 def index():
     
-    with open('index.html', 'r') as f:
-        content = f.read()
+    with open('Output/index.html', 'r') as fichier:
+        content = fichier.read()
 
     return render_template('base.html', 
            content=content,
@@ -33,7 +51,9 @@ def index():
 @app.route('/md')
 def md():
 
-    with open('mon_fichier.md','r') as fichier :
+    global nom_fichier 
+
+    with open('Md/'+nom_fichier,'r') as fichier :
         content=fichier.read()
     
     return render_template('md.html',content=content)
@@ -42,7 +62,7 @@ def md():
 @app.route('/html')
 def html():
 
-    with open('index.html','r') as fichier :
+    with open('Output/index.html','r') as fichier :
         content=fichier.read()
     
     return render_template('html.html',content=content)
