@@ -21,7 +21,7 @@ def generation_html(chemin):
     except :
         print("Le fichier n existe pas . Recommencer")
 
-nom_fichier = "mon_fichier"+".md"
+nom_fichier = "Exemple"+".md"
 chemin = "Md/"+nom_fichier
 generation_html(chemin)
 
