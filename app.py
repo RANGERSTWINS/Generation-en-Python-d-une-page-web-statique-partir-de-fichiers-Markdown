@@ -1,44 +1,31 @@
+import markdown
 from flask import Flask, render_template
 
-def convert_md_to_html(md_file, html_file):
-    # Ouvrir le fichier Markdown en mode lecture
-    with open(md_file, 'r') as f:
-        contenu_md = f.read()
-    
-    # Convertir le contenu Markdown en HTML
-    html_content = ""
-    lines = contenu_md.split("\n")
+#convertir le fichier md en fichier html
+def generation_html(chemin):
 
-    for line in lines:
-        # Gérer les balises spéciales Markdown
+    print("Génération de la page Html ...")
+
+    try :
         
-        # Titres
-        if line.startswith("#"):
-            level = line.count("#")
-            line = line.strip("#").strip()
-            html_content += f"<h{level}>{line}</h{level}>"
-        
-        # Paragraphes
-        elif line.strip() != "":
-            html_content += f"<p>{line}</p>"
+        with open(chemin, "r") as fichier_md:
+            contenu_md = fichier_md.read()
 
-        #Listes
-        if line.startswith("-"):
-            html_content += f"<ul> <li> {line} </li> </ul>"
+        contenu_html = markdown.markdown(contenu_md)
 
-        #> blockquote 
-        if line.startswith(">"):
-            html_content += f"<blockquote>{line}</blockquote>"
+        with open("Output/index.html", "w") as fichier_html:
+            fichier_html.write(contenu_html)
 
-    # Écrire le contenu HTML dans le fichier
-    with open(html_file, 'w') as f:
-        f.write(html_content)
+        print("Génération terminée ! ")
 
-# Exemple d'utilisation
-chemin = "Md/mon_fichier.md"
-sortie = "Output/index.html"
-convert_md_to_html(chemin, sortie)
+    except :
+        print("Le fichier n existe pas . Recommencer")
 
+nom_fichier = "Exemple"+".md"
+chemin = "Md/"+nom_fichier
+generation_html(chemin)
+
+#création du serveur local pour affichage du fichier html généré avec css et template
 
 app = Flask(__name__)
 app.static_folder = 'static'
@@ -47,9 +34,8 @@ app.static_folder = 'static'
 #affichage du fichier markdown convertit en html
 @app.route('/')
 def index():
-    global sortie
     
-    with open(sortie, 'r') as fichier:
+    with open('Output/index.html', 'r') as fichier:
         content = fichier.read()
 
     return render_template('base.html', 
@@ -71,9 +57,8 @@ def md():
 #affichage du fichier html de base
 @app.route('/html')
 def html():
-    global sortie
 
-    with open(sortie,'r') as fichier :
+    with open('Output/index.html','r') as fichier :
         content=fichier.read()
     
     return render_template('html.html',content=content)
